@@ -26,39 +26,40 @@ public class Main {
         System.out.println("Введите значение e: ");
         double e = input.nextDouble();
 
-        System.out.printf("arcsin(x), сумма %d слагаемых: %.8f%n", n, arcsinus(x, n));
-        System.out.printf("arcsin(x), сумма слагаемых, которые по абсолютной величине больше e (%f): %.8f%n", e, arcsinus(x, n, e));
-        System.out.printf("arcsin(x), сумма слагаемых, которые по абсолютной величине больше e/10 (%f): %.8f%n", e/10, arcsinus(x, n, e/10));
-        System.out.printf("arcsin(x), значение с помощью метода Math: %.8f%n", Math.asin(x));
+        Solution solution = calculate(x, n, e);
+
+        System.out.printf("arcsin(x)%nСумма %d слагаемых: %.010f%n", n, solution.sumN);
+        System.out.printf("Сумма %d слагаемых, которые по абсолютной величине больше e (%f): %.010f%n", solution.nE, e, solution.sumE);
+        System.out.printf("Сумма %d слагаемых, которые по абсолютной величине больше e/10 (%f): %.010f%n", solution.nE10, e/10, solution.sumE10);
+        System.out.printf("Значение, полученное с помощью метода Math.asin(x): %.010f%n", solution.fValue);
     }
 
-    public static double arcsinus(double x, int n){
-        double arcsin = x;
-        double numerator = 1;
-        double denominator = 1;
+    public static Solution calculate(double x, int n, double e){
+        Solution solution = new Solution();
+        solution.fValue = Math.asin(x);
 
-        for (int i = 1; i < n; i++){
-            numerator *= (2 * i - 1);
-            denominator *= 2 * i;
-            arcsin += (numerator/denominator) * (Math.pow(x, (2 * i + 1)) / (2 * i + 1));
-        }
-        return arcsin;
-    }
+        double a = x;
 
-    public static double arcsinus(double x, int n, double e){
-        double arcsin = x;
-        double numerator = 1;
-        double denominator = 1;
-        double result;
-
-        for (int i = 1; i <= n; i++){
-            numerator *= (2 * i - 1);
-            denominator *= 2 * i;
-            result = (numerator/denominator) * (Math.pow(x, (2 * i + 1)) / (2 * i + 1));
-            if (Math.abs(result) > e) {
-                arcsin += result;
+        for (int i = 0; i < n || Math.abs(a) > e / 10; i++) {
+            if (i < n) {
+                solution.sumN += a;
             }
+            if (Math.abs(a) > e) {
+                solution.sumE += a;
+                solution.nE++;
+            }
+            if (Math.abs(a) > e / 10) {
+                solution.sumE10 += a;
+                solution.nE10++;
+            }
+            a = next(a, i + 1, x);
         }
-        return arcsin;
+        return solution;
+    }
+
+    public static double next(double a, int i, double x){
+        a *= x * x * (2 * i - 1) * (2 * i - 1) / ((2 * i) * (2 * i + 1));
+
+        return a;
     }
 }
